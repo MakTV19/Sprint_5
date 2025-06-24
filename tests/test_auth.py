@@ -1,78 +1,38 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.wait import WebDriverWait
-from faker import Faker
-from locators import RegistrationLocators as Loc
 
-class TestRegistration:
+class RegistrationLocators:
+    LOGIN_BTN = (By.XPATH, "//button[text()='Вход и регистрация']")
+    NO_ACCOUNT_BTN = (By.XPATH, "//button[text()='Нет аккаунта']")
+    EMAIL_INPUT = (By.NAME, "email")
+    PASSWORD_INPUT = (By.NAME, "password")
+    CONFIRM_PASSWORD_INPUT = (By.NAME, "submitPassword")
+    CREATE_ACCOUNT_BTN = (By.XPATH, "//button[text()='Создать аккаунт']")
+    USERNAME_TEXT = (By.CSS_SELECTOR, "h3.profileText.name")
+    SUBMIT_BTN = (By.XPATH, "//button[text()='Войти']")
+    LOGOUT_BTN = (By.XPATH, "//button[text()='Выйти']")
+    ERROR_HINT = (By.XPATH, "//*[contains(text(), 'Ошибка')]")
 
-    def test_valid_user_registration(self):
-        fake = Faker()
-        new_email = fake.email()
-        password = fake.password()
+class LoginLocators:
+    EMAIL_INPUT = (By.NAME, "email")
+    PASSWORD_INPUT = (By.NAME, "password")
+    SUBMIT_BTN = (By.XPATH, "//button[text()='Войти']")
+    LOGOUT_BTN = (By.XPATH, "//button[text()='Выйти']")
 
-        driver = webdriver.Chrome()
-        driver.get("https://qa-desk.stand.praktikum-services.ru/")
+class CreatePostLocators:
+    POST_BTN = (By.XPATH, "//button[text()='Разместить объявление']")
+    FORM_TITLE = (By.XPATH, "//h1[contains(text(), 'Новое объявление')]")
+    NAME_INPUT = (By.NAME, "name")
+    DESCRIPTION_INPUT = (By.XPATH, "//textarea[@placeholder='Описание товара']")
+    PRICE_INPUT = (By.NAME, "price")
 
-        driver.find_element(*Loc.LOGIN_BTN).click()
-        driver.find_element(*Loc.NO_ACCOUNT_BTN).click()
-        driver.find_element(*Loc.EMAIL_INPUT).send_keys(new_email)
-        driver.find_element(*Loc.PASSWORD_INPUT).send_keys(password)
-        driver.find_element(*Loc.CONFIRM_PASSWORD_INPUT).send_keys(password)
-        driver.find_element(*Loc.CREATE_ACCOUNT_BTN).click()
+    OPEN_DROP_DOWN_CITY = (By.XPATH, ".//div[contains(@class, 'dropDownMenu_input__itKtw') and contains(@style, '760px')]/button")
+    CITY_OPTIONS = (By.XPATH, ".//div[contains(@class, 'dropDownMenu_dropMenu__sBxhz') and contains(@style, '760px')]/*[@class = 'dropDownMenu_options__CmHmm']")
+    CITY_OPTION_MSK = (By.XPATH, ".//*[@class='undefined dropDownMenu_textColor__Nyo8k' and text() = 'Москва']")
 
-        user_info = WebDriverWait(driver, 10).until(expected_conditions.visibility_of_element_located(Loc.USERNAME_TEXT))
-
-        assert user_info.is_displayed()
-
-        driver.quit()
-
-    def test_registration_invalid_email(self):
-        driver = webdriver.Chrome()
-        driver.get("https://qa-desk.stand.praktikum-services.ru/")
-
-        driver.find_element(*Loc.LOGIN_BTN).click()
-        driver.find_element(*Loc.NO_ACCOUNT_BTN).click()
-        driver.find_element(*Loc.EMAIL_INPUT).send_keys("***")
-        driver.find_element(*Loc.CREATE_ACCOUNT_BTN).click()
-
-        error = WebDriverWait(driver, 5).until(expected_conditions.visibility_of_element_located(Loc.ERROR_HINT))
-
-        assert "Ошибка" in error.text
-        driver.quit()
-
-    def test_registration_existing_user(self):
-        driver = webdriver.Chrome()
-        driver.get("https://qa-desk.stand.praktikum-services.ru/")
-
-        fake = Faker()
-        email = fake.email()
-        password = fake.password()
-
-        driver = webdriver.Chrome()
-        driver.get("https://qa-desk.stand.praktikum-services.ru/")
-
-        driver.find_element(*Loc.LOGIN_BTN).click()
-        driver.find_element(*Loc.NO_ACCOUNT_BTN).click()
-        driver.find_element(*Loc.EMAIL_INPUT).send_keys(email)
-        driver.find_element(*Loc.PASSWORD_INPUT).send_keys(password)
-        driver.find_element(*Loc.CONFIRM_PASSWORD_INPUT).send_keys(password)
-        driver.find_element(*Loc.CREATE_ACCOUNT_BTN).click()
-
-        WebDriverWait(driver, 10).until(expected_conditions.visibility_of_element_located(Loc.USERNAME_TEXT))
-        driver.quit()
-
-        driver = webdriver.Chrome()
-        driver.get("https://qa-desk.stand.praktikum-services.ru/")
-        driver.find_element(*Loc.LOGIN_BTN).click()
-        driver.find_element(*Loc.NO_ACCOUNT_BTN).click()
-        driver.find_element(*Loc.EMAIL_INPUT).send_keys(email)
-        driver.find_element(*Loc.PASSWORD_INPUT).send_keys(password)
-        driver.find_element(*Loc.CONFIRM_PASSWORD_INPUT).send_keys(password)
-        driver.find_element(*Loc.CREATE_ACCOUNT_BTN).click()
-
-        error = WebDriverWait(driver, 5).until(expected_conditions.visibility_of_element_located(Loc.ERROR_HINT))
-
-        assert "Ошибка" in error.text
-        driver.quit()
+    CONDITION_NEW_RADIO = (By.XPATH, "//input[@type='radio' and @value='Новый']")
+    PUBLISH_BTN = (By.XPATH, "//button[text()='Опубликовать']")
+    MY_ADS_HEADER = (By.XPATH, "//h2[text()='Мои объявления']")
+    AVATAR_BTN = (By.CLASS_NAME, "avatar__container")
+    PROFILE_HEADER = (By.XPATH, "//h2[text()='Профиль']")
+    MODAL_AUTH_HEADER = (By.XPATH, "//h1[contains(text(), 'Чтобы разместить объявление')]")
+    CONDITION_USED_RADIO = (By.XPATH, "//input[@type='radio' and @value='Б/У']")

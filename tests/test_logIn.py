@@ -1,41 +1,42 @@
+import pytest
 from selenium import webdriver
-from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions
 from faker import Faker
 from locators import RegistrationLocators as Loc
+from urls import BASE_URL
 
-def test_valid_login():
-    fake = Faker()
-    email = fake.email()
-    password = fake.password()
+class TestLogin:
+    def setup_method(self):
+        self.driver = webdriver.Chrome()
+        self.driver.get(BASE_URL)
 
-    # Регистрация нового пользователя
-    driver = webdriver.Chrome()
-    driver.get("https://qa-desk.stand.praktikum-services.ru/")
+    def teardown_method(self):
+        self.driver.quit()
 
-    driver.find_element(*Loc.LOGIN_BTN).click()
-    driver.find_element(*Loc.NO_ACCOUNT_BTN).click()
-    driver.find_element(*Loc.EMAIL_INPUT).send_keys(email)
-    driver.find_element(*Loc.PASSWORD_INPUT).send_keys(password)
-    driver.find_element(*Loc.CONFIRM_PASSWORD_INPUT).send_keys(password)
-    driver.find_element(*Loc.CREATE_ACCOUNT_BTN).click()
+    def test_valid_login(self):
+        fake = Faker()
+        email = fake.email()
+        password = fake.password()
 
-    WebDriverWait(driver, 10).until(
-        expected_conditions.visibility_of_element_located(Loc.USERNAME_TEXT))
+        WebDriverWait(self.driver, 10).until(expected_conditions.element_to_be_clickable(Loc.LOGIN_BTN)).click()
+        self.driver.find_element(*Loc.NO_ACCOUNT_BTN).click()
+        self.driver.find_element(*Loc.EMAIL_INPUT).send_keys(email)
+        self.driver.find_element(*Loc.PASSWORD_INPUT).send_keys(password)
+        self.driver.find_element(*Loc.CONFIRM_PASSWORD_INPUT).send_keys(password)
+        self.driver.find_element(*Loc.CREATE_ACCOUNT_BTN).click()
 
-    driver.quit()
+        WebDriverWait(self.driver, 10).until(
+            expected_conditions.visibility_of_element_located(Loc.USERNAME_TEXT))
 
-    # Повторный вход
-    driver = webdriver.Chrome()
-    driver.get("https://qa-desk.stand.praktikum-services.ru/")
+        self.driver.find_element(*Loc.LOGOUT_BTN).click()
 
-    driver.find_element(*Loc.LOGIN_BTN).click()
-    driver.find_element(*Loc.EMAIL_INPUT).send_keys(email)
-    driver.find_element(*Loc.PASSWORD_INPUT).send_keys(password)
-    driver.find_element(*Loc.SUBMIT_BTN).click()
+        WebDriverWait(self.driver, 10).until(expected_conditions.element_to_be_clickable(Loc.LOGIN_BTN)).click()
+        self.driver.find_element(*Loc.EMAIL_INPUT).send_keys(email)
+        self.driver.find_element(*Loc.PASSWORD_INPUT).send_keys(password)
+        self.driver.find_element(*Loc.SUBMIT_BTN).click()
 
-    user_info = WebDriverWait(driver, 10).until(
-        expected_conditions.visibility_of_element_located(Loc.USERNAME_TEXT))
+        user_info = WebDriverWait(self.driver, 10).until(
+            expected_conditions.visibility_of_element_located(Loc.USERNAME_TEXT))
 
-    assert user_info.is_displayed()
-    driver.quit()
+        assert user_info.is_displayed()
