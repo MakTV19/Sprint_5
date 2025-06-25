@@ -1,0 +1,2 @@
+TEST_USER_EMAIL = "auto@example.com"
+TEST_USER_PASSWORD = "secure1234"
